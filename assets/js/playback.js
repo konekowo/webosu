@@ -30,6 +30,8 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
             self.started = false;
             self.app = app;
             self.upcomingHits = [];
+            self.videoOffsetMS = 0;
+
             // creating a copy of hitobjects
             self.hits = [];
             _.each(self.track.hitObjects, function (o) {
@@ -267,6 +269,8 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
             this.resume = function () {
                 this.osu.audio.play();
                 document.getElementById("bgVideo").play();
+                let pGameArea = document.getElementById("game-area");
+                requestPointerLockWithUnadjustedMovement(pGameArea);
                 this.game.paused = false;
                 document.getElementById("pause-menu").setAttribute("hidden", "");
             };
@@ -448,9 +452,11 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 
                 if (self.track.events.length != 0) {
                     var file = self.track.events[0][2];
-                    if (track.events[1][0] === "Video") {
-                        //file = self.track.events[1][2];
-                        isVideo = true;
+                    if (track.events.length > 1) {
+                        if (track.events[1][0] === "Video") {
+                            //file = self.track.events[1][2];
+                            isVideo = true;
+                        }
                     }
                     file = file.substr(1, file.length - 2);
                     console.log(track.events);
@@ -469,16 +475,34 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
             };
            
             let isVideo = false;
+            let isWeird = false;
+            self.videoOffsetMS = 0;
             document.getElementById("bgDimVideo").style.display = "block";
             console.log(track.events);
-            if (track.events[1][0] === "Video") {
-                isVideo = true;
+            if (track.events.length > 1) {
+                if (track.events[1][0] === "Video") {
+                    isVideo = true;
+                    self.videoOffsetMS = parseInt(track.events[1][1]);
+                }
+                if (track.events[0][0] === "Video"){
+                    isVideo = true;
+                    self.videoOffsetMS = parseInt(track.events[0][1]);
+                    isWeird = true;
+                }
             }
+
 
             if (isVideo){
                 //loadBackground("assets/img/black.png");
                 let vidElem = document.getElementById("bgVideo");
-                let file = track.events[1][2];
+                let file = ""
+                if (!isWeird){
+                    file = track.events[1][2];
+                }
+                else {
+                    file = track.events[0][2];
+                }
+
                 file = file.substr(1, file.length - 2);
                 entry = osu.zip.getChildByName(file);
                     if (entry) {
@@ -486,7 +510,22 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                             var uri = URL.createObjectURL(blob);
                             console.log(uri);
                             vidElem.src = uri;
-                            vidElem.play();
+                            //let vidElem = document.getElementById("bgVideo");
+                            let positiveOffsetMS = 0;
+                            if (self.videoOffsetMS !== 0){
+                                if (self.videoOffsetMS > 0){
+                                    positiveOffsetMS = self.videoOffsetMS;
+                                }
+                                if (self.videoOffsetMS < 0){
+                                    vidElem.currentTime = Math.abs(self.videoOffsetMS)/1000
+                                }
+                            }
+                            console.log(self.hits[0]);
+                            setTimeout(()=> {
+                                vidElem.play();
+                            }, positiveOffsetMS + self.backgroundFadeTime + self.wait);
+
+
                         });
                     }
             }
@@ -539,17 +578,17 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 let basedep = 4.9999 - 0.0001 * hit.hitIndex;
 
                 hit.base = newHitSprite("disc.png", basedep, 0.5);
-                hit.base.tint = combos[hit.combo % combos.length];
+                //hit.base.tint = combos[hit.combo % combos.length];
 
                 hit.circle = newHitSprite("hitcircleoverlay.png", basedep, 0.5);
                 hit.glow = newHitSprite("ring-glow.png", basedep + 2, 0.46);
-                hit.glow.tint = combos[hit.combo % combos.length];
+                //hit.glow.tint = combos[hit.combo % combos.length];
                 hit.glow.blendMode = PIXI.BLEND_MODES.ADD;
                 hit.burst = newHitSprite("hitburst.png", 8.00005 + 0.0001 * hit.hitIndex);
                 hit.burst.visible = false;
 
                 hit.approach = newHitSprite("approachcircle.png", 8 + 0.0001 * hit.hitIndex);
-                hit.approach.tint = combos[hit.combo % combos.length];
+                //hit.approach.tint = combos[hit.combo % combos.length];
 
                 hit.judgements.push(this.createJudgement(hit.x, hit.y, 4, hit.time + this.MehTime));
 
@@ -1313,12 +1352,20 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
             }
 
             this.updateBackground = function (time) {
-                if (self.track.events[1][0] === "Video"){
-                    let fade = self.game.backgroundDimRate;
-                    if (time < -self.wait)
-                        fade *= Math.max(0, 1 - (-self.wait - time) / self.backgroundFadeTime);
-                    document.getElementById("bgDimVideo").style.opacity = fade;
-                    //console.log(fade);
+                if (self.track.events.length > 1) {
+                    if (self.track.events[1][0] === "Video") {
+                        let fade = self.game.backgroundDimRate;
+                        if (time < -self.wait)
+                            fade *= Math.max(0, 1 - (-self.wait - time) / self.backgroundFadeTime);
+                        document.getElementById("bgDimVideo").style.opacity = fade;
+                        //console.log(fade);
+                    }
+                    if (self.track.events[0][0] === "Video"){
+                        let fade = self.game.backgroundDimRate;
+                        if (time < -self.wait)
+                            fade *= Math.max(0, 1 - (-self.wait - time) / self.backgroundFadeTime);
+                        document.getElementById("bgDimVideo").style.opacity = fade;
+                    }
                 }
                 if (!self.background) return;
                 let fade = self.game.backgroundDimRate;
@@ -1341,6 +1388,9 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 if (typeof time !== 'undefined') {
                     let nextapproachtime = (waitinghitid < this.hits.length && this.hits[waitinghitid].time - (this.hits[waitinghitid].approachTime || this.approachTime) > time) ? this.hits[waitinghitid].time - (this.hits[waitinghitid].approachTime || this.approachTime) : -1;
                     this.breakOverlay.countdown(nextapproachtime, time);
+
+
+
                     this.updateBackground(time);
                     this.updateHitObjects(time);
                     this.scoreOverlay.update(time);
@@ -1421,6 +1471,8 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 self.osu.audio.gain.gain.value = self.game.musicVolume * self.game.masterVolume;
                 self.osu.audio.playbackRate = self.playbackRate;
                 self.osu.audio.play(self.backgroundFadeTime + self.wait);
+                let pGameArea = document.getElementById("game-area");
+                requestPointerLockWithUnadjustedMovement(pGameArea);
             };
 
             this.retry = function () {
@@ -1456,3 +1508,24 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
 
         return Playback;
     });
+
+function requestPointerLockWithUnadjustedMovement(canvas) {
+    const promise = canvas.requestPointerLock({
+        unadjustedMovement: true,
+    });
+
+    if (!promise) {
+        console.log("disabling mouse acceleration is not supported");
+        return;
+    }
+
+    return promise
+        .then(() => console.log("pointer is locked"))
+        .catch((error) => {
+            if (error.name === "NotSupportedError") {
+                // Some platforms may not support unadjusted movement.
+                // You can request again a regular pointer lock.
+                return canvas.requestPointerLock();
+            }
+        });
+}

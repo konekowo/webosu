@@ -56,6 +56,7 @@ function launchOSU(osu, beatmapid, version) {
         game.stage.addChild(game.cursor);
     }
 
+
     // switch page to game view
     if (game.autofullscreen)
         document.documentElement.requestFullscreen();
@@ -63,6 +64,9 @@ function launchOSU(osu, beatmapid, version) {
     var pMainPage = document.getElementById("main-page");
     var pNav = document.getElementById("main-nav");
     pGameArea.appendChild(app.view);
+    //pointer lock
+    //requestPointerLockWithUnadjustedMovement(pGameArea);
+
     if (game.autoplay) {
         pGameArea.classList.remove("shownomouse");
         pGameArea.classList.remove("showhwmousemedium");
@@ -159,4 +163,25 @@ function launchGame(osublob, beatmapid, version) {
             console.error("unzip failed", err);
         }
     );
+}
+
+function requestPointerLockWithUnadjustedMovement(canvas) {
+    const promise = canvas.requestPointerLock({
+        unadjustedMovement: true,
+    });
+
+    if (!promise) {
+        console.log("disabling mouse acceleration is not supported");
+        return;
+    }
+
+    return promise
+        .then(() => console.log("pointer is locked"))
+        .catch((error) => {
+            if (error.name === "NotSupportedError") {
+                // Some platforms may not support unadjusted movement.
+                // You can request again a regular pointer lock.
+                return canvas.requestPointerLock();
+            }
+        });
 }

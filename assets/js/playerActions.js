@@ -154,10 +154,31 @@ define([], function () {
                 r: Math.hypot(velocity.x, velocity.y) * Math.max(t - m[0].t, window.currentFrameInterval)
             }
         }
-
+        let mouseX = 0;
+        let mouseY = 0;
         var mousemoveCallback = function (e) {
-            playback.game.mouseX = (e.clientX - gfx.xoffset) / gfx.width * 512;
-            playback.game.mouseY = (e.clientY - gfx.yoffset) / gfx.height * 384;
+            let pGameArea = document.getElementById("game-area");
+            if (document.pointerLockElement === pGameArea){
+                mouseX += e.movementX * 0.8;
+                mouseY += e.movementY * 0.8;
+
+                // Clamp mouse position to canvas boundaries if needed
+                mouseX = Math.max(0, Math.min(mouseX, window.innerWidth));
+                mouseY = Math.max(0, Math.min(mouseY, window.innerHeight));
+
+                // Calculate the mouse position relative to gfx.width and gfx.height
+                const relativeMouseX = (mouseX - gfx.xoffset) / gfx.width * 512;
+                const relativeMouseY = (mouseY - gfx.yoffset) / gfx.height * 384;
+
+                playback.game.mouseX = relativeMouseX;
+                playback.game.mouseY = relativeMouseY;
+            }
+            else {
+                playback.game.mouseX = (e.clientX - gfx.xoffset) / gfx.width * 512;
+                playback.game.mouseY = (e.clientY - gfx.yoffset) / gfx.height * 384;
+            }
+
+
             movehistory.unshift({
                 x: playback.game.mouseX,
                 y: playback.game.mouseY,

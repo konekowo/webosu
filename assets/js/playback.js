@@ -182,7 +182,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
             self.scoreOverlay = new ScoreOverlay({
                 width: game.window.innerWidth,
                 height: game.window.innerHeight
-            }, this.HP, scoreModMultiplier);
+            }, this.HP, scoreModMultiplier, this);
             self.circleRadius = (109 - 9 * this.CS) / 2; // unit: osu! pixel
             self.hitSpriteScale = self.circleRadius / 60;
             self.MehTime = 200 - 10 * this.OD;
@@ -239,31 +239,59 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
 
 
             self.game.paused = false;
-            this.pause = function () {
+            this.pause = function (isFail = false) {
                 if (this.osu.audio.pause()) { // pause music success
                     this.game.paused = true;
+                    document.getElementById("bgVideo").pause();
+                    document.exitPointerLock();
                     let menu = document.getElementById("pause-menu");
-                    menu.removeAttribute("hidden");
                     btn_continue = document.getElementById("pausebtn-continue");
                     btn_retry = document.getElementById("pausebtn-retry");
                     btn_quit = document.getElementById("pausebtn-quit");
-                    document.getElementById("bgVideo").pause();
-                    btn_continue.onclick = function () {
-                        self.resume();
-                        btn_continue.onclick = null;
-                        btn_retry.onclick = null;
-                        btn_quit.onclick = null;
+                    if (!isFail){
+                        menu.removeAttribute("hidden");
+
+
+
+                        btn_continue.onclick = function () {
+                            self.resume();
+                            btn_continue.onclick = null;
+                            btn_retry.onclick = null;
+                            btn_quit.onclick = null;
+                        }
+                        btn_retry.onclick = function () {
+                            self.game.paused = false;
+                            menu.setAttribute("hidden", "");
+                            self.retry();
+                        }
+                        btn_quit.onclick = function () {
+                            self.game.paused = false;
+                            menu.setAttribute("hidden", "");
+                            self.quit();
+                        }
                     }
-                    btn_retry.onclick = function () {
-                        self.game.paused = false;
-                        menu.setAttribute("hidden", "");
-                        self.retry();
+                    else {
+                        document.getElementById("fail-menu").removeAttribute("hidden");
+                        let failbtn_retry = document.getElementById("failbtn-retry");
+                        let failbtn_quit = document.getElementById("failbtn-quit");
+                        failbtn_retry.onclick = function () {
+                            self.game.paused = false;
+                            document.getElementById("fail-menu").setAttribute("hidden", "");
+                            self.retry();
+                            failbtn_retry.onclick = null;
+                            failbtn_quit.onclick = null;
+                        }
+                        failbtn_quit.onclick = function () {
+                            self.game.paused = false;
+                            document.getElementById("fail-menu").setAttribute("hidden", "");
+                            self.quit();
+                            failbtn_retry.onclick = null;
+                            failbtn_quit.onclick = null;
+                        }
                     }
-                    btn_quit.onclick = function () {
-                        self.game.paused = false;
-                        menu.setAttribute("hidden", "");
-                        self.quit();
-                    }
+
+
+
                 }
             };
             this.resume = function () {
@@ -1473,6 +1501,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 self.osu.audio.play(self.backgroundFadeTime + self.wait);
                 let pGameArea = document.getElementById("game-area");
                 requestPointerLockWithUnadjustedMovement(pGameArea);
+                document.body.style.overflowY = "hidden";
             };
 
             this.retry = function () {
@@ -1497,6 +1526,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 self.destroy();
                 if (window.quitGame)
                     window.quitGame();
+                document.body.style.overflowY = "scroll";
             }
 
             this.skip = function () {
@@ -1523,6 +1553,7 @@ function requestPointerLockWithUnadjustedMovement(canvas) {
         .then(() => console.log("pointer is locked"))
         .catch((error) => {
             if (error.name === "NotSupportedError") {
+                console.warn("Raw Mouse Input is not supported in this OS or Browser, using normal Pointer Lock (won't be that accurate)")
                 // Some platforms may not support unadjusted movement.
                 // You can request again a regular pointer lock.
                 return canvas.requestPointerLock();

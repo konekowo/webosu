@@ -45,7 +45,7 @@ define([],
             const borderwidth = 0.128;
             const innerPortion = 1 - borderwidth;
             const edgeOpacity = 0.3;
-            const centerOpacity = 0.8;
+            const centerOpacity = 0.6;
             const blurrate = 0.015;
             const width = 200;
             //console.log(colors);
@@ -68,17 +68,26 @@ define([],
                     let R, G, B, A;
                     if (position >= innerPortion) // draw border color
                     {
-                        R = borderR;
-                        G = borderG;
-                        B = borderB;
+                        R = 0.5;
+                        G = 0.5;
+                        B = 0.5;
                         A = borderA;
                     } else // draw inner color
                     {
-                        R = innerR;
-                        G = innerG;
-                        B = innerB;
+                        R = 0.1 + (((edgeOpacity - centerOpacity) * position / innerPortion + centerOpacity) - 0.4);
+                        G = 0.1 + (((edgeOpacity - centerOpacity) * position / innerPortion + centerOpacity) - 0.4);
+                        B = 0.1 + (((edgeOpacity - centerOpacity) * position / innerPortion + centerOpacity) - 0.4);
+                        if (R < 0){
+                            R = 0.1;
+                        }
+                        if (G < 0){
+                            G = 0.1;
+                        }
+                        if (B < 0){
+                            B = 0.1;
+                        }
                         // TODO: tune this to make opacity transition smoother at center
-                        A = innerA * ((edgeOpacity - centerOpacity) * position / innerPortion + centerOpacity);
+                        A = 0.8;//innerA * ((edgeOpacity - centerOpacity) * position / innerPortion + centerOpacity);
                         //console.log(A);
                     }
                     // pre-multiply alpha

@@ -60,7 +60,7 @@ define([], function () {
     }
 
 
-    function ScoreOverlay(windowfield, HPdrain, scoreMultiplier) // constructor. 
+    function ScoreOverlay(windowfield, HPdrain, scoreMultiplier, playback) // constructor.
     {
         PIXI.Container.call(this);
 
@@ -146,11 +146,11 @@ define([], function () {
         this.HPincreasefor = function (result) {
             switch (result) {
                 case 0:
-                    return -0.02 * this.HPdrain;
+                    return -0.03 * this.HPdrain;
                 case 50:
                     return 0.01 * (4 - this.HPdrain);
                 case 100:
-                    return 0.01 * (8 - this.HPdrain);
+                    return 0.01 * (6 - this.HPdrain);
                 case 300:
                     return 0.01 * (10.2 - this.HPdrain);
                 default:
@@ -247,6 +247,18 @@ define([], function () {
             this.setSpriteArrayPos(this.scoreDigits, basex - this.scoreDigits.width / 2, basey);
             this.setSpriteArrayPos(this.accuracyDigits, basex - this.scoreDigits.width / 2 - this.accuracyDigits.width - 16 * unit, basey + 3 * unit);
             this.setSpriteArrayPos(this.comboDigits, basex + this.scoreDigits.width / 2 + 16 * unit, basey + 3 * unit);
+            if (this.HP < 0){
+                setTimeout(() => {
+                    try{
+                        playback.pause(true);
+                    }
+                    catch(e){
+                        console.warn("Couldn't fail player, probably because the map ended before 1 second after the user failed. Error:", e)
+                    }
+
+                }, 1000)
+
+            }
         }
 
         function uploadScore(summary) {
@@ -344,6 +356,7 @@ define([], function () {
             let grading = newdiv(null, "grading");
             grading.classList.add("transparent");
             document.body.appendChild(grading);
+            document.exitPointerLock();
             let top = newdiv(grading, "top");
             let info = newdiv(top, "beatmap-info");
             newdiv(info, "title", metadata.Title);

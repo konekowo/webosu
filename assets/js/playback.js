@@ -504,6 +504,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
            
             let isVideo = false;
             let isWeird = false;
+            let isAVI = false;
             self.videoOffsetMS = 0;
             document.getElementById("bgDimVideo").style.display = "block";
             console.log(track.events);
@@ -511,16 +512,40 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 if (track.events[1][0] === "Video") {
                     isVideo = true;
                     self.videoOffsetMS = parseInt(track.events[1][1]);
+                    let file = "";
+                    if (!isWeird){
+                        file = track.events[1][2];
+                    }
+                    else {
+                        file = track.events[0][2];
+                    }
+
+                    file = file.substr(1, file.length - 2);
+                    if (file.endsWith(".avi")){
+                        isAVI = true;
+                    }
                 }
                 if (track.events[0][0] === "Video"){
                     isVideo = true;
                     self.videoOffsetMS = parseInt(track.events[0][1]);
                     isWeird = true;
+                    let file = "";
+                    if (!isWeird){
+                        file = track.events[1][2];
+                    }
+                    else {
+                        file = track.events[0][2];
+                    }
+
+                    file = file.substr(1, file.length - 2);
+                    if (file.endsWith(".avi")){
+                        isAVI = true;
+                    }
                 }
             }
 
 
-            if (isVideo){
+            if (isVideo && !isAVI){
                 //loadBackground("assets/img/black.png");
                 let vidElem = document.getElementById("bgVideo");
                 let file = ""
@@ -535,9 +560,14 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 entry = osu.zip.getChildByName(file);
                     if (entry) {
                         entry.getBlob("video/mp4", function (blob) {
-                            var uri = URL.createObjectURL(blob);
-                            console.log(uri);
-                            vidElem.src = uri;
+                            let uri = URL.createObjectURL(blob);
+
+                                console.log(uri);
+                                vidElem.src = uri;
+
+
+
+
                             //let vidElem = document.getElementById("bgVideo");
                             let positiveOffsetMS = 0;
                             if (self.videoOffsetMS !== 0){
@@ -677,14 +707,14 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                     // curve points are of about-same distance, so these 2 points should be different
                     let p = hit.curve.curve[hit.curve.curve.length - 1];
                     let p2 = hit.curve.curve[hit.curve.curve.length - 2];
-                    hit.reverse = newSprite("reversearrow.png", p.x, p.y, 0.36);
+                    hit.reverse = newSprite("reversearrow.png", p.x, p.y, 0.66);
                     hit.reverse.rotation = Math.atan2(p2.y - p.y, p2.x - p.x);
                 }
                 if (hit.repeat > 2) {
                     // curve points are of about-same distance, so these 2 points should be different
                     let p = hit.curve.curve[0];
                     let p2 = hit.curve.curve[1];
-                    hit.reverse_b = newSprite("reversearrow.png", p.x, p.y, 0.36);
+                    hit.reverse_b = newSprite("reversearrow.png", p.x, p.y, 0.66);
                     hit.reverse_b.rotation = Math.atan2(p2.y - p.y, p2.x - p.x);
                     hit.reverse_b.visible = false; // Only visible when it's the next end to hit
                 }
@@ -1342,6 +1372,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 if (time > hit.time) {
                     hit.base.rotation = hit.rotation / 2;
                     hit.top.rotation = hit.rotation / 2;
+                    console.log(progress);
                     hit.progress.scale.set(0.6 * (0.13 + 0.87 * clamp01(progress)));
                 } else {
                     hit.progress.scale.set(0);
@@ -1444,7 +1475,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 }
             }
 
-            this.destroy = function () {
+            this.destroy = function (retry = false) {
                 // clean up
                 console.log("Destroy gamefield");
                 _.each(self.hits, function (hit) {
@@ -1471,7 +1502,10 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 self.breakOverlay.destroy(opt);
                 self.progressOverlay.destroy(opt);
                 self.gamefield.destroy(opt);
-                document.getElementById("bgVideo").src = "";
+                if (!retry){
+                    document.getElementById("bgVideo").src = "";
+                }
+
                 document.getElementById("bgDimVideo").style.display = "none";
                 document.getElementById("bgDimVideo").style.opacity = "0";
                 try {
@@ -1510,7 +1544,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                     self.game.paused = true;
                 }
                 console.log("Re-trying playback...");
-                self.destroy();
+                self.destroy(true);
                 self.constructor(self.game, self.osu, self.track);
                 self.loadingMenu.hide();
                 self.audioReady = true;

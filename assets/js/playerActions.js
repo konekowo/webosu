@@ -159,8 +159,8 @@ define([], function () {
         var mousemoveCallback = function (e) {
             let pGameArea = document.getElementById("game-area");
             if (document.pointerLockElement === pGameArea){
-                mouseX += e.movementX * 0.8;
-                mouseY += e.movementY * 0.8;
+                mouseX += e.movementX * window.game.sensitivity;
+                mouseY += e.movementY * window.game.sensitivity;
 
                 // Clamp mouse position to canvas boundaries if needed
                 mouseX = Math.max(0, Math.min(mouseX, window.innerWidth));

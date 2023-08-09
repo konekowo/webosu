@@ -104,6 +104,7 @@ require(["osu", "underscore", "sound", "playback"],
                 'sounds/drum-hitclap.ogg',
                 'sounds/drum-slidertick.ogg',
                 'sounds/combobreak.ogg',
+                'sounds/spinnerbonus.wav'
             ];
             sounds.whenLoaded = function(){
                 game.sample[1].hitnormal = sounds['normal-hitnormal.ogg'];
@@ -122,6 +123,7 @@ require(["osu", "underscore", "sound", "playback"],
                 game.sample[3].hitclap = sounds['drum-hitclap.ogg'];
                 game.sample[3].slidertick = sounds['drum-slidertick.ogg'];
                 game.sampleComboBreak = sounds['combobreak.ogg'];
+                game.sampleSpinnerBonus = sounds['spinnerbonus.wav'];
                 window.soundReady = true;
                 document.getElementById("sound-progress").classList.add("finished");
                 document.body.classList.add("sound-ready");

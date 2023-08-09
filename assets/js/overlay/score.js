@@ -227,7 +227,7 @@ define([], function () {
             }
         }
 
-        this.update = function (time) {
+        this.update = function (time, playbackUpdate) {
             if (Number.isNaN(time)) {
                 console.error("score overlay update with time = NaN");
                 return;

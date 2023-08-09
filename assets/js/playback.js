@@ -564,7 +564,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
 
                                 console.log(uri);
                                 vidElem.src = uri;
-
+                                vidElem.volume = 0;
 
 
 
@@ -763,12 +763,17 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                     hit.objects.push(sprite);
                     return sprite;
                 }
-                hit.base = newsprite("spinnerbase.png");
-                hit.progress = newsprite("spinnerprogress.png");
-                hit.top = newsprite("spinnertop.png");
+                hit.base = newsprite("spinner-background.png");
+                hit.progress = newsprite("spinner-metre.png");
+                hit.top = newsprite("spinner-circle.png");
+                hit.spinnerApproach = newsprite("spinner-approachcircle.png");
+
+
                 if (this.modhidden) {
                     hit.progress.visible = false;
                     hit.base.visible = false;
+                    hit.spinnerApproach.visible = false;
+
                 }
 
                 hit.judgements.push(this.createJudgement(hit.x, hit.y, 4, hit.endTime + 233));
@@ -1323,6 +1328,8 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                     this.updateJudgement(hit.judgements[i], time);
             }
 
+
+
             this.updateSpinner = function (hit, time) {
                 // update rotation
                 if (time >= hit.time && time <= hit.endTime) {
@@ -1356,12 +1363,14 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 hit.top.alpha = alpha;
                 hit.progress.alpha = alpha;
                 hit.base.alpha = alpha;
+                hit.spinnerApproach.alpha = alpha;
 
                 // calculate scales of components
                 if (time < hit.endTime) {
                     // top zoom in first
-                    hit.top.scale.set(0.3 * clamp01((time - (hit.time - self.spinnerZoomInTime - self.spinnerAppearTime)) / self.spinnerZoomInTime));
+                    hit.top.scale.set(0.6 * clamp01((time - (hit.time - self.spinnerZoomInTime - self.spinnerAppearTime)) / self.spinnerZoomInTime));
                     hit.base.scale.set(0.6 * clamp01((time - (hit.time - self.spinnerZoomInTime)) / self.spinnerZoomInTime));
+                    hit.spinnerApproach.scale.set(0.55 * clamp01((time - (hit.time - self.spinnerZoomInTime)) / self.spinnerZoomInTime));
                 }
                 if (time < hit.time) {
                     let t = (hit.time - time) / (self.spinnerZoomInTime + self.spinnerAppearTime);
@@ -1372,8 +1381,65 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
                 if (time > hit.time) {
                     hit.base.rotation = hit.rotation / 2;
                     hit.top.rotation = hit.rotation / 2;
-                    console.log(progress);
-                    hit.progress.scale.set(0.6 * (0.13 + 0.87 * clamp01(progress)));
+                    //console.log(progress);
+                    hit.spinnerApproach.scale.set(0.55 * clamp01((hit.time - (time - (hit.endTime - hit.time))) / (hit.endTime - hit.time)));
+                    hit.progress.scale.set(0.6);
+                    if (progress >= 1){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height)), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.9){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*0.2), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.8){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*0.4), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.7){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*0.6), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.6){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*0.8), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.5){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.4){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*1.2), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.3){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*1.4), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.2){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*1.6), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else if (progress >= 0.1){
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*1.8), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+                    else {
+                        const mask = new PIXI.Graphics();
+                        mask.drawRect((window.innerWidth/2)-(hit.progress.width), ((window.innerHeight/2)-(hit.progress.height))+(hit.progress.height*2), hit.progress.width*2, hit.progress.height*2); // Define the cropping rectangle (x, y, width, height)
+                        hit.progress.mask = mask;
+                    }
+
                 } else {
                     hit.progress.scale.set(0);
                 }
@@ -1452,7 +1518,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
 
                     this.updateBackground(time);
                     this.updateHitObjects(time);
-                    this.scoreOverlay.update(time);
+                    this.scoreOverlay.update(time, this);
                     this.game.updatePlayerActions(time);
                     this.progressOverlay.update(time);
                     this.errorMeter.update(time);

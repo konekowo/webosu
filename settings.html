@@ -74,11 +74,22 @@
                 </tr>
                 <tr>
                     <td>
-                        <div class="option-name">Raw cursor input</div>
+                        <div class="option-name">Mouse Sensitivity</div>
+                        <div class="option-control">
+                            <input id="sensitivity-range" class="slider" type="range" min="0.1" max="2.0" step="0.01"
+                                   value="0.5">
+                            <div class="range-indicator" id="sensitivity-range-indicator" hidden></div>
+                            <div style="font-size: 0.8em; color: #999; margin-top: 2.2em;">Cursor Sensitivity, this is just like osu!'s sensitivity, so you can set the same sensitivity as real osu! and it should be the same speed (if you have the same resolution monitor/laptop screen and the same mouse, and if your computer/browser supports <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/requestPointerLock#browser_compatibility">Canvas Pointer Lock with unadjusted movement,</a> Firefox and Safari don't support this at the time of writing this: 8/7/2023)</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="option-name">Show CSS cursor</div>
                         <div class="option-control">
                             <input id="showhwmouse-check" type="checkbox" /><span></span>
                         </div>
-                        <div style="font-size: 0.8em; color: #999; margin-top: 2.2em;">Bypass accel and smoothing, may help with lag on lower end systems.</div>
+                        <div style="font-size: 0.8em; color: #999; margin-top: 2.2em;">THIS SETTING IS BROKEN, DO NOT USE!</div>
                     </td>
                 </tr>
                 <tr>

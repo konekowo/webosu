@@ -12,13 +12,14 @@ function setOptionPanel() {
 	// Give inputs initial value; set their callback on change
 	// Give range inputs a visual feedback (a hovering indicator that shows on drag)
 	let defaultsettings = {
-		dim: 60,
+		dim: 85,
 		blur: 0,
-		cursorsize: 1.0,
+		cursorsize: 1.5,
+		sensitivity: 1.0,
 		showhwmouse: false,
 		snakein: true,
-		snakeout: true,
-		autofullscreen: false,
+		snakeout: false,
+		autofullscreen: true,
 		sysdpi: true,
 		dpiscale: 1.0,
 
@@ -26,18 +27,18 @@ function setOptionPanel() {
 		disableButton: false,
 		K1name: 'Z',
 		K2name: 'X',
-		Kpausename: 'SPACE',
+		Kpausename: 'ESC',
 		Kpause2name: 'ESC',
-		Kskipname: 'CTRL',
+		Kskipname: 'SPACE',
 		K1keycode: 90,
 		K2keycode: 88,
-		Kpausekeycode: 32,
+		Kpausekeycode: 27,
 		Kpause2keycode: 27,
-		Kskipkeycode: 17,
+		Kskipkeycode: 32,
 
-		mastervolume: 35,
+		mastervolume: 100,
 		effectvolume: 100,
-		musicvolume: 50,
+		musicvolume: 100,
 		audiooffset: 0,
 		beatmapHitsound: true,
 
@@ -49,7 +50,7 @@ function setOptionPanel() {
 		autoplay: false,
 
         hideNumbers: false,
-        hideGreat: true,
+        hideGreat: false,
         hideFollowPoints: false,
 		soundNames: undefined,
 	};
@@ -63,6 +64,7 @@ function setOptionPanel() {
 	        window.game.backgroundDimRate = this.dim / 100;
 	        window.game.backgroundBlurRate = this.blur / 100;
 	        window.game.cursorSize = parseFloat(this.cursorsize);
+			window.game.sensitivity = parseFloat(this.sensitivity);
 	        window.game.showhwmouse = this.showhwmouse;
 	        window.game.snakein = this.snakein;
 	        window.game.snakeout = this.snakeout;
@@ -287,6 +289,7 @@ function setOptionPanel() {
 	bindrange("dim-range", "dim", function(v){return v+"%"});
 	bindrange("blur-range", "blur", function(v){return v+"%"});
 	bindrange("cursorsize-range", "cursorsize", function(v){return v.toFixed(2)+"x"});
+	bindrange("sensitivity-range", "sensitivity", function(v){return v.toFixed(2)+"x"});
 	bindcheck("showhwmouse-check", "showhwmouse");
 	bindcheck("snakein-check", "snakein");
 	bindcheck("snakeout-check", "snakeout");

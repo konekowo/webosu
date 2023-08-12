@@ -249,7 +249,7 @@ define([], function () {
             this.setSpriteArrayPos(this.scoreDigits, basex - this.scoreDigits.width / 2, basey);
             this.setSpriteArrayPos(this.accuracyDigits, basex - this.scoreDigits.width / 2 - this.accuracyDigits.width - 16 * unit, basey + 3 * unit);
             this.setSpriteArrayPos(this.comboDigits, basex + this.scoreDigits.width / 2 + 16 * unit, basey + 3 * unit);
-            if (this.HP < 0){
+            if (this.HP < 0 && !game.nofail){
                 setTimeout(() => {
                     try{
                         playback.pause(true);
@@ -326,6 +326,7 @@ define([], function () {
                 if (game.hardrock) l.push("HR");
                 if (game.nightcore) l.push("NC");
                 if (game.autoplay) l.push("AT");
+                if (game.nofail) l.push("NF");
                 if (l.length == 0) return "";
                 let s = l[0];
                 for (let i = 1; i < l.length; ++i)
@@ -354,7 +355,7 @@ define([], function () {
                 return div;
             }
             let acc = this.judgeTotal / this.maxJudgeTotal;
-            let rank = this.HP < 0 ? "F" : grade(acc);
+            let rank = grade(acc);
             let grading = newdiv(null, "grading");
             grading.classList.add("transparent");
             document.body.appendChild(grading);

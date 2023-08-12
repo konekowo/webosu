@@ -111,11 +111,15 @@
                     }
                     if (val && val.size) {
                         list = Array.from(val);
-                        function addlist(startoffset, maxlength) {
-                            for (let i = startoffset; i < list.length && i < startoffset + maxlength; ++i)
-                                addBeatmapSid(list[i]);
+                        function addlist() {
+
+                            let requestStr = "?ids="+list[0];
+                            for (let i = 1; i < list.length; ++i)
+                                requestStr+="&ids="+list[i];
+                            console.log(list, requestStr);
+                            addBeatmapList("https://catboy.best/api/v2/beatmapsets" + requestStr, false, true);
                         }
-                        addlist(0, 1000);
+                        addlist();
                         var cur = 1000;
                     } else {
                         document.getElementById("beatmap-list").innerText =

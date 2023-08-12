@@ -166,7 +166,7 @@
             <div class="footer-infos">
                 <span class="footer-info">Join the <a href="https://discord.gg/v7wBtSdYzx">Discord server</a>!</span>
                 <span class="footer-info">Beatmap API: <a href="https://catboy.best/">Mino</a></span>
-                <span class="footer-info">Stable Release: <a href="https://github.com/BlaNKtext/webosu">3.0</a></span>
+                <span class="footer-info">Stable Release: <a href="https://github.com/konekowo/webosu">3.0</a></span>
             </div>
         </div>
         <script src="./import.js"></script>
@@ -257,11 +257,8 @@
                 })
             }
         // Get new beatmaps
-        addBeatmapList("https://catboy.best/api/search?amount=6&mode=0",
-            document.getElementById("beatmap-list-new"),
-            function (t) {
-                return (t.modes & 1) != 0;
-            }, 6);
+        addBeatmapList("https://catboy.best/api/v2/search?amount=6&mode=0",
+            document.getElementById("beatmap-list-new"), true);
         // Get random beatmaps
         function genRandomList() {
             // Wipe Random List
@@ -269,16 +266,12 @@
             list.innerHTML = ''
             // Re-fill Random List
             let randquery = Math.random().toString(36).replace(/[^a-p]+/g, '').substr(1, 5);
-            addBeatmapList("https://catboy.best/api/search?q=" + randquery + "&amount=6&mode=0", list,
-                function (t) {
-                    while (list.firstChild) list.removeChild(list.firstChild);
-                    return (t.modes & 1) != 0;
-                }, 6);
+            addBeatmapList("https://catboy.best/api/v2/search?q=" + randquery + "&amount=6&mode=0", list, true)
         }
         genRandomList();
         // Get hot beatmaps
-        addBeatmapList("https://catboy.best/api/search?amount=6&mode=0&query=Top Rated", document.getElementById(
-            "beatmap-list-hot"));
+        addBeatmapList("https://catboy.best/api/v2/search?amount=6&mode=0&query=Top Rated", document.getElementById(
+            "beatmap-list-hot"), true);
         // Favorite beatmaps
         if (window.localforage) {
             window.localforage.getItem("likedsidset", function (err, val) {

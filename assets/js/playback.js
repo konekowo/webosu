@@ -178,6 +178,7 @@ define(["osu", "playerActions", "SliderMesh", "overlay/score", "overlay/volume",
             if (game.hardrock) scoreModMultiplier *= 1.06;
             if (game.nightcore) scoreModMultiplier *= 1.12;
             if (game.hidden) scoreModMultiplier *= 1.06;
+            if (game.nofail) scoreModMultiplier *= 0.50;
 
             self.scoreOverlay = new ScoreOverlay({
                 width: game.window.innerWidth,

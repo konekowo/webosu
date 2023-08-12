@@ -40,7 +40,7 @@ function startpreview(box) {
     }
 }
 
-function startdownload(box) {
+function startdownload(box, isV2 = false) {
     startpreview(box);
     if (box.downloading) {
         return;
@@ -57,7 +57,13 @@ function startdownload(box) {
     let bar = document.createElement("progress");
     container.className = "download-progress";
     title.className = "title";
-    title.innerText = box.setdata.Title;
+    if (isV2){
+        title.innerText = box.setdata.title;
+    }
+    else {
+        title.innerText = box.setdata.Title;
+    }
+
     container.appendChild(title);
     container.appendChild(bar);
     // insert so that download list from recent to old
